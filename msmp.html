@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRF+ &amp; MSMP Workflow Cheat Sheet</title>
+<style>
+  :root{
+    --bg:            #0B1E33;
+    --paper:         #F4F7FB;
+    --ink:           #0B1E33;
+    --ink-soft:      #4A5C72;
+    --line:          #DCE4EE;
+
+    --blue:          #1E6FD9;   /* BRF+ Application & Function */
+    --blue-soft:     #E7F0FD;
+    --teal:          #0E9B8A;   /* BRF+ Expressions */
+    --teal-soft:     #E4F6F3;
+    --amber:         #D97C1F;   /* MSMP Process, Path, Stage */
+    --amber-soft:    #FBEEE0;
+    --violet:        #7A5CC7;   /* MSMP Agents & Notifications */
+    --violet-soft:   #EFEAFB;
+
+    --code-bg:       #0F2540;
+    --code-ink:      #BFD9FF;
+    --param-bg:      #FFF3D6;
+    --param-ink:     #7A4E00;
+
+    --shadow: 0 1px 2px rgba(11,30,51,.06), 0 8px 20px -12px rgba(11,30,51,.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #123159 0%, transparent 60%),
+      var(--bg);
+    font-family:'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    color:var(--ink);
+    padding:32px 16px 64px;
+  }
+
+  .sheet{max-width:1400px; margin:0 auto;}
+
+  /* ---------- Header ---------- */
+  .masthead{
+    background:linear-gradient(135deg, #0F2540 0%, #143A66 55%, #1E6FD9 130%);
+    border-radius:18px;
+    padding:26px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+  .masthead .title-block h1{
+    margin:0 0 6px;
+    color:#fff;
+    font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:clamp(24px, 3vw, 34px);
+    letter-spacing:.3px;
+  }
+  .masthead .title-block .eyebrow{
+    display:inline-block;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#9FC4FF;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .nav-links{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .nav-links a{
+    color:#EAF2FF; text-decoration:none; font-size:12.5px; font-weight:700;
+    padding:9px 16px; border-radius:999px; white-space:nowrap;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    transition:background .15s,border-color .15s;
+  }
+  .nav-links a:hover{background:rgba(255,255,255,.18);}
+  .nav-links a.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+
+  /* ---------- Generic panel ---------- */
+  .panel{
+    background:var(--paper);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    border:1px solid var(--line);
+  }
+  .panel h2{
+    margin:0 0 12px;
+    font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:16px;
+    letter-spacing:.2px;
+    color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel h2::before{content:""; width:8px;height:8px;border-radius:2px; background:var(--blue); display:inline-block;}
+  .panel p{margin:0 0 8px; font-size:13.5px; line-height:1.55; color:var(--ink-soft);}
+
+  .top-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+  }
+  .top-row .panel:nth-child(2) h2::before{background:var(--teal);}
+  .top-row .panel:nth-child(3) h2::before{background:var(--violet);}
+
+  .section-title{
+    color:#EAF2FF;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-weight:700;
+    margin:26px 4px 12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(234,242,255,.35), transparent);}
+
+  /* ---------- Module cards (4-across) ---------- */
+  .module-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:16px;
+    margin-bottom:8px;
+  }
+  .module-card{
+    border-radius:16px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:10px;
+    border-top:5px solid var(--blue);
+    background:var(--paper);
+  }
+  .module-card.c1{border-top-color:var(--blue);}
+  .module-card.c2{border-top-color:var(--teal);}
+  .module-card.c3{border-top-color:var(--amber);}
+  .module-card.c4{border-top-color:var(--violet);}
+
+  .module-card .badge{
+    align-self:flex-start; font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:12px; letter-spacing:.5px; padding:4px 10px; border-radius:999px;
+  }
+  .c1 .badge{background:var(--blue-soft); color:var(--blue);}
+  .c2 .badge{background:var(--teal-soft); color:var(--teal);}
+  .c3 .badge{background:var(--amber-soft); color:var(--amber);}
+  .c4 .badge{background:var(--violet-soft); color:var(--violet);}
+
+  .module-card h3{margin:0; font-family:'Space Grotesk',sans-serif; font-size:17px;}
+  .module-card > p.desc{font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0 0 4px;}
+
+  .subhead{
+    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--ink-soft); margin:6px 0 4px;
+  }
+
+  .kv-list{list-style:none; margin:0 0 4px; padding:0; font-size:12.8px; line-height:1.55;}
+  .kv-list li{margin-bottom:3px;}
+  .kv-list b, .kv-list strong{color:var(--ink);}
+
+  .pill-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px;}
+  .pill{
+    font-size:11.5px; background:#EEF3FA; color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:6px; padding:3px 8px; font-weight:600;
+  }
+
+  code.tbl{
+    font-family:'JetBrains Mono','Courier New',monospace;
+    background:var(--code-bg); color:var(--code-ink);
+    padding:1px 6px; border-radius:5px; font-size:11.8px; font-weight:600; white-space:nowrap;
+  }
+  .table-list{list-style:none; margin:0; padding:0; font-size:12.5px; line-height:1.7; color:var(--ink-soft);}
+  .table-list li{display:flex; gap:6px; align-items:baseline; flex-wrap:wrap;}
+
+  .param-list{list-style:none; margin:0; padding:0; font-size:12.5px; line-height:1.8;}
+  .param-list li{display:flex; gap:8px; align-items:baseline;}
+  .param-num{
+    font-family:'JetBrains Mono',monospace; background:var(--param-bg); color:var(--param-ink);
+    font-weight:700; border-radius:5px; padding:1px 7px; font-size:11.5px; flex-shrink:0;
+  }
+
+  .divider{height:1px; background:var(--line); margin:8px 0 2px;}
+
+  /* ---------- Step flow ---------- */
+  .flow{list-style:none; margin:0; padding:0; counter-reset:step;}
+  .flow li{
+    counter-increment:step;
+    position:relative;
+    padding:8px 0 8px 34px;
+    font-size:12.8px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    border-bottom:1px dashed var(--line);
+  }
+  .flow li:last-child{border-bottom:none;}
+  .flow li::before{
+    content: counter(step);
+    position:absolute; left:0; top:8px;
+    width:22px; height:22px; border-radius:50%;
+    background:var(--blue); color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:11.5px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flow li b{color:var(--ink);}
+
+  /* ---------- Bottom row ---------- */
+  .bottom-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:16px;
+    margin-top:16px;
+  }
+  .bottom-row .panel:nth-child(1) h2::before{background:var(--blue);}
+  .bottom-row .panel:nth-child(2) h2::before{background:var(--amber);}
+  .bottom-row .panel:nth-child(3) h2::before{background:var(--violet);}
+
+  .glossary dt{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px;
+    color:var(--violet); margin-top:10px;
+  }
+  .glossary dt:first-child{margin-top:0;}
+  .glossary dd{margin:2px 0 0; font-size:12.8px; color:var(--ink-soft); line-height:1.5;}
+
+  .job-list{list-style:none; margin:0 0 10px; padding:0; font-size:12.5px;}
+  .job-list li{
+    font-family:'JetBrains Mono',monospace; background:#0F2540; color:#9FDDD3;
+    border-radius:6px; padding:5px 9px; margin-bottom:6px; font-size:11.5px;
+  }
+
+  footer{text-align:center; color:#8FB0DA; font-size:12px; margin-top:28px; letter-spacing:.3px;}
+
+  @media (max-width:1150px){
+    .top-row{grid-template-columns:1fr 1fr;}
+    .module-grid{grid-template-columns:1fr 1fr;}
+    .bottom-row{grid-template-columns:1fr;}
+  }
+  @media (max-width:640px){
+    .top-row{grid-template-columns:1fr;}
+    .module-grid{grid-template-columns:1fr;}
+    .masthead{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- Header -->
+  <div class="masthead">
+    <div class="title-block">
+      <span class="eyebrow">Reference Sheet · SAP GRC Workflow Engine</span>
+      <h1>BRF+ &amp; MSMP Cheat Sheet</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="ecc.html">ECC Security</a>
+      <a href="grc.html">GRC (AC)</a>
+      <a href="msmp.html" class="active">BRF+ / MSMP</a>
+      <a href="fiori.html">Fiori Security</a>
+    </nav>
+  </div>
+
+  <!-- Overview -->
+  <div class="top-row">
+    <div class="panel">
+      <h2>What is BRF+</h2>
+      <p>Business Rule Framework Plus is an ABAP‑based rules engine, part of the NetWeaver stack, used to define and execute business rules without hard‑coding logic into ABAP.</p>
+      <p>A <b>Function</b> receives <b>Context</b> (input) and returns a <b>Result</b>, evaluated through rule sets and expressions such as decision tables, formulas, and rules.</p>
+      <p>Transaction: <code class="tbl">BRF+</code> / <code class="tbl">BRFPLUS</code></p>
+    </div>
+    <div class="panel">
+      <h2>What is MSMP</h2>
+      <p>Multi‑Stage Multi‑Path is GRC's workflow engine &mdash; it lets you build flexible, condition‑based approval workflows for ARM, EAM (FF log review), and BRM.</p>
+      <p>Every workflow is built from a <b>Process ID</b>, an <b>Initiator Rule</b>, one or more <b>Paths</b>, and <b>Stages</b> with assigned <b>Agents</b>.</p>
+      <p>BC Set: <code class="tbl">GRC_MSMP_CONFIGURATION</code></p>
+    </div>
+    <div class="panel">
+      <h2>How they work together</h2>
+      <p>MSMP is the workflow shell &mdash; it decides <i>which path and stage</i> a request goes through. BRF+ is the decision engine behind it &mdash; it decides <i>who approves</i> and <i>which path is triggered</i>.</p>
+      <p>MSMP calls BRF+ for two things: <b>Initiator Rules</b> (which path to route to) and <b>Agent Rules</b> (who the approver is at a stage).</p>
+      <p>Rule shells are generated from MSMP via <code class="tbl">GRFNMW_DEV_RULES</code>, then built out inside BRF+.</p>
+    </div>
+  </div>
+
+  <!-- Module cards -->
+  <div class="section-title">Core Components</div>
+  <div class="module-grid">
+
+    <!-- BRF+ Application & Function -->
+    <div class="module-card c1">
+      <span class="badge">BRF+</span>
+      <h3>Application &amp; Function</h3>
+      <p class="desc">The container and the interface: every rule lives inside an application, and every application exposes one or more functions.</p>
+
+      <div class="subhead">Building blocks</div>
+      <ul class="kv-list">
+        <li><b>Application:</b> top‑level container &mdash; holds functions, data objects, rule sets</li>
+        <li><b>Function:</b> the interface between the calling program and the rules &mdash; defined by Context (input) + Result (output)</li>
+        <li><b>Data Object:</b> element, structure, or table used inside expressions</li>
+        <li><b>Ruleset:</b> a group of rules assigned to exactly one function; priority (0&ndash;99) sets execution order</li>
+      </ul>
+      <div class="divider"></div>
+      <ul class="kv-list">
+        <li><b>Event mode:</b> function runs its rule sets in priority order at runtime</li>
+        <li>Changing to Event mode resets the result data object &mdash; must be reconfigured manually</li>
+      </ul>
+
+      <div class="subhead">Key transaction</div>
+      <div class="pill-row"><span class="pill">BRF+ / BRFPLUS</span><span class="pill">GRFNMW_DEV_RULES</span></div>
+    </div>
+
+    <!-- BRF+ Expressions -->
+    <div class="module-card c2">
+      <span class="badge">BRF+</span>
+      <h3>Expression Types</h3>
+      <p class="desc">Expressions hold the actual logic inside a rule set &mdash; the decision table is the most commonly used in GRC agent/initiator rules.</p>
+
+      <ul class="kv-list">
+        <li><b>Decision Table:</b> maps input column combinations to a result row &mdash; easiest to read and maintain</li>
+        <li><b>Decision Tree:</b> branches sequentially on conditions</li>
+        <li><b>Formula:</b> performs calculations on data objects</li>
+        <li><b>Rule / Boolean:</b> combines conditions with AND / OR / NOT</li>
+        <li><b>Procedure Call:</b> calls a function module or class method</li>
+        <li><b>Database Lookup:</b> reads values from a custom or standard table</li>
+      </ul>
+
+      <div class="subhead">Common GRC use in AC</div>
+      <ul class="kv-list">
+        <li>Agent rule via <b>DB Lookup</b> on a custom table</li>
+        <li>Agent rule via <b>role membership</b> (users assigned to a PFCG role)</li>
+        <li>Initiator rule to route requests to different paths</li>
+      </ul>
+    </div>
+
+    <!-- MSMP Process, Path, Stage -->
+    <div class="module-card c3">
+      <span class="badge">MSMP</span>
+      <h3>Process, Path &amp; Stage</h3>
+      <p class="desc">The structural hierarchy of a workflow &mdash; every request follows exactly one path made of ordered stages.</p>
+
+      <ul class="kv-list">
+        <li><b>Process ID:</b> the workflow scenario, e.g. <code class="tbl">SAP_GRAC_ACCESS_REQUEST</code></li>
+        <li><b>Initiator Rule:</b> one active rule per Process ID &mdash; decides which path (Rule Result) a request takes</li>
+        <li><b>Path:</b> a defined sequence of approval stages (e.g. Manager &rarr; Security &rarr; Role Owner)</li>
+        <li><b>Stage:</b> a single approval step within a path, with its own agent(s)</li>
+        <li><b>Route Mapping:</b> links a request's attributes to the correct path/stage combination</li>
+      </ul>
+
+      <div class="subhead">Notifications</div>
+      <ul class="kv-list">
+        <li>Configured per Agent + Event + Template</li>
+        <li>Sent on <b>REQUEST_SUBMISSION</b> or <b>END_OF_REQUEST</b></li>
+        <li>Templates reference an SE61 document; variables personalize the message</li>
+      </ul>
+    </div>
+
+    <!-- MSMP Agents & Rules -->
+    <div class="module-card c4">
+      <span class="badge">MSMP</span>
+      <h3>Agents &amp; Rule Types</h3>
+      <p class="desc">An Agent ID tells MSMP who should act at a stage. GRC supports four ways to determine that agent.</p>
+
+      <ul class="kv-list">
+        <li><b>Directly mapped users:</b> a fixed user or small team handles the stage</li>
+        <li><b>PFCG role‑based:</b> whoever holds a given role in the GRC system becomes approver</li>
+        <li><b>User group‑based:</b> all members of a defined user group are notified</li>
+        <li><b>GRC API rules (BRF+):</b> dynamically determines the owner from conditions (e.g. module‑based routing to FI vs SD security teams)</li>
+      </ul>
+      <div class="divider"></div>
+
+      <div class="subhead">Rule categories in Maintain Rules</div>
+      <div class="pill-row">
+        <span class="pill">Function Module rule</span><span class="pill">ABAP Class rule</span><span class="pill">BRF+ rule</span>
+      </div>
+      <p style="font-size:12.3px; margin-top:4px;">All three appear as <b>GRC API Rules</b> when assigning an Agent Type in MSMP.</p>
+    </div>
+  </div>
+
+  <!-- Build steps + tables -->
+  <div class="section-title">Configuration Flow &amp; Reference</div>
+  <div class="bottom-row">
+
+    <div class="panel">
+      <h2>Build an ARM Workflow &mdash; Step by Step</h2>
+      <ol class="flow">
+        <li><b>Activate BC Set</b> &mdash; SPRO &rarr; GRC &rarr; Access Control &rarr; Workflow for Access Control &rarr; Activate MSMP BC Set (<code class="tbl">GRC_MSMP_CONFIGURATION</code>)</li>
+        <li><b>Define initiator &amp; agent rules</b> in BRF+ (generate rule shell via <code class="tbl">GRFNMW_DEV_RULES</code>, build logic in BRF+)</li>
+        <li><b>Maintain Rules</b> in MSMP &mdash; register the new rule so it's available for selection</li>
+        <li><b>Add Agent Rule</b> &mdash; MSMP Workflow Configuration &rarr; Maintain Agent Rule &rarr; add rule details &amp; rule result</li>
+        <li><b>Maintain Agents</b> &mdash; add new Agent ID as a GRC API Rule under MSMP &rarr; Maintain Agents</li>
+        <li><b>Create path &amp; stages</b> &mdash; add stages and assign approvers/agents to each stage</li>
+        <li><b>Set Global Initiator</b> &mdash; MSMP &rarr; Global Rules &rarr; assign the new Initiator Rule</li>
+        <li><b>Generate, Simulate &amp; Activate</b> &mdash; MSMP &rarr; Generate Versions &rarr; Save &rarr; Simulate &rarr; Activate</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>Important Tables &amp; T‑codes</h2>
+      <div class="subhead">MSMP / Workflow</div>
+      <ul class="table-list">
+        <li><code class="tbl">GRFNMW_DEV_RULES</code> Generate MSMP rule shell (BRF+)</li>
+        <li><code class="tbl">GRFNMW_CONFIG</code> MSMP workflow configuration</li>
+        <li><code class="tbl">GRFNMW_ACTIVATE_PATH</code> Path activation</li>
+        <li><code class="tbl">SWI1 / SWI2_FREQ</code> Standard SAP workflow log/monitor</li>
+      </ul>
+      <div class="subhead">BRF+</div>
+      <ul class="table-list">
+        <li><code class="tbl">BRF+ / BRFPLUS</code> Main BRF+ workbench</li>
+        <li><code class="tbl">FDT_*</code> BRF+ repository tables (package SFDT_CORE)</li>
+      </ul>
+      <div class="subhead">SPRO path (both)</div>
+      <p style="font-size:12.3px;">IMG &rarr; Governance, Risk and Compliance &rarr; Access Control &rarr; Workflow for Access Control &rarr; Define Workflow‑related MSMP rules</p>
+    </div>
+
+    <div class="panel">
+      <h2>Glossary</h2>
+      <dl class="glossary">
+        <dt>Context</dt><dd>The importing parameters passed into a BRF+ function &mdash; the "input" of the rule.</dd>
+        <dt>Result</dt><dd>The output parameter returned by a BRF+ function after rule evaluation.</dd>
+        <dt>Rule Result</dt><dd>The value an Initiator Rule returns, used by MSMP to pick which path a request follows.</dd>
+        <dt>Agent ID</dt><dd>A named reference in MSMP that resolves to one or more approvers at a stage.</dd>
+        <dt>Priority (0&ndash;99)</dt><dd>Execution order of rule sets within a BRF+ function &mdash; 0 runs first.</dd>
+        <dt>Simulate</dt><dd>MSMP's built‑in test step to validate path/stage/agent logic before activating a workflow.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <footer>BRF+ &amp; MSMP Cheat Sheet · Same layout system as the GRC AC Cheat Sheet</footer>
+</div>
+</body>
+</html>

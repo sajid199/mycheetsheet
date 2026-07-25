@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Security Cheat Sheet</title>
+<style>
+  :root{
+    --bg:            #0B1E33;
+    --paper:         #F4F7FB;
+    --ink:           #0B1E33;
+    --ink-soft:      #4A5C72;
+    --line:          #DCE4EE;
+
+    --blue:          #1E6FD9;
+    --blue-soft:     #E7F0FD;
+    --teal:          #0E9B8A;
+    --teal-soft:     #E4F6F3;
+    --amber:         #D97C1F;
+    --amber-soft:    #FBEEE0;
+    --violet:        #7A5CC7;
+    --violet-soft:   #EFEAFB;
+    --red:           #D14343;
+    --red-soft:      #FBE7E7;
+    --green:         #1E9E5A;
+    --green-soft:    #E4F7EC;
+    --gold:          #B8860B;
+    --gold-soft:     #FBF1DA;
+
+    --code-bg:       #0F2540;
+    --code-ink:      #BFD9FF;
+    --param-bg:      #FFF3D6;
+    --param-ink:     #7A4E00;
+
+    --shadow: 0 1px 2px rgba(11,30,51,.06), 0 8px 20px -12px rgba(11,30,51,.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #123159 0%, transparent 60%),
+      var(--bg);
+    font-family:'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    color:var(--ink);
+    padding:32px 16px 64px;
+  }
+  .sheet{max-width:1400px; margin:0 auto;}
+
+  /* Header */
+  .masthead{
+    background:linear-gradient(135deg, #0F2540 0%, #143A66 55%, #1E6FD9 130%);
+    border-radius:18px; padding:26px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    box-shadow:var(--shadow); margin-bottom:18px;
+  }
+  .masthead .title-block h1{
+    margin:0 0 6px; color:#fff; font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:clamp(24px, 3vw, 34px); letter-spacing:.3px;
+  }
+  .masthead .title-block .eyebrow{
+    display:inline-block; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:#9FC4FF; font-weight:700; margin-bottom:6px;
+  }
+  .nav-links{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .nav-links a{
+    color:#EAF2FF; text-decoration:none; font-size:12.5px; font-weight:700;
+    padding:9px 16px; border-radius:999px; white-space:nowrap;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    transition:background .15s,border-color .15s;
+  }
+  .nav-links a:hover{background:rgba(255,255,255,.18);}
+  .nav-links a.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+
+  .panel{
+    background:var(--paper); border-radius:16px; box-shadow:var(--shadow);
+    padding:20px 22px; border:1px solid var(--line);
+  }
+  .panel h2{
+    margin:0 0 12px; font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:16px; letter-spacing:.2px; color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel h2::before{content:""; width:8px;height:8px;border-radius:2px; background:var(--blue); display:inline-block;}
+  .panel p{margin:0 0 8px; font-size:13.5px; line-height:1.55; color:var(--ink-soft);}
+
+  .section-title{
+    color:#EAF2FF; font-family:'Space Grotesk',sans-serif; font-size:13px;
+    letter-spacing:2px; text-transform:uppercase; font-weight:700;
+    margin:26px 4px 12px; display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(234,242,255,.35), transparent);}
+
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+  .row1{display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:16px;}
+
+  .row3 .panel:nth-child(2) h2::before{background:var(--teal);}
+  .row3 .panel:nth-child(3) h2::before{background:var(--violet);}
+  .row2 .panel:nth-child(2) h2::before{background:var(--amber);}
+
+  .subhead{
+    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--ink-soft); margin:10px 0 4px;
+  }
+  .subhead:first-child{margin-top:0;}
+
+  .kv-list{list-style:none; margin:0 0 4px; padding:0; font-size:12.8px; line-height:1.6;}
+  .kv-list li{margin-bottom:6px;}
+  .kv-list b, .kv-list strong{color:var(--ink);}
+
+  code.tbl{
+    font-family:'JetBrains Mono','Courier New',monospace;
+    background:var(--code-bg); color:var(--code-ink);
+    padding:1px 6px; border-radius:5px; font-size:11.8px; font-weight:600; white-space:nowrap;
+  }
+  .table-list{list-style:none; margin:0; padding:0; font-size:12.5px; line-height:1.75; color:var(--ink-soft);}
+  .table-list li{display:flex; gap:6px; align-items:baseline; flex-wrap:wrap;}
+
+  .tcode-list{list-style:none; margin:0; padding:0; font-size:12.8px; line-height:1.55;}
+  .tcode-list li{
+    display:grid; grid-template-columns:88px 1fr; gap:8px; align-items:baseline;
+    padding:5px 0; border-bottom:1px dashed var(--line);
+  }
+  .tcode-list li:last-child{border-bottom:none;}
+  .tcode-list .code{
+    font-family:'JetBrains Mono',monospace; background:var(--code-bg); color:var(--code-ink);
+    padding:2px 7px; border-radius:5px; font-size:11.5px; font-weight:700; text-align:center;
+  }
+  .tcode-list .desc{color:var(--ink-soft);}
+
+  .divider{height:1px; background:var(--line); margin:8px 0 2px;}
+
+  /* Traffic indicator dots */
+  .traffic-item{display:flex; gap:10px; margin-bottom:10px; align-items:flex-start;}
+  .dot{width:14px;height:14px;border-radius:50%; flex-shrink:0; margin-top:3px; box-shadow:0 0 0 3px rgba(0,0,0,.03) inset;}
+  .dot.red{background:var(--red);}
+  .dot.yellow{background:#E8B400;}
+  .dot.green{background:var(--green);}
+  .traffic-item p{margin:0; font-size:12.8px; color:var(--ink-soft); line-height:1.5;}
+  .traffic-item b{color:var(--ink); font-size:13px;}
+
+  /* return code badges */
+  .rc-item{display:flex; gap:10px; margin-bottom:8px; align-items:flex-start;}
+  .rc-badge{
+    font-family:'JetBrains Mono',monospace; font-weight:800; font-size:11.5px;
+    border-radius:6px; padding:3px 8px; flex-shrink:0; min-width:52px; text-align:center;
+  }
+  .rc-badge.ok{background:var(--green-soft); color:var(--green);}
+  .rc-badge.warn{background:var(--gold-soft); color:var(--gold);}
+  .rc-badge.err{background:var(--red-soft); color:var(--red);}
+  .rc-item p{margin:0; font-size:12.6px; color:var(--ink-soft); line-height:1.5;}
+
+  /* flow / step list reused for SU25 + Expert Mode */
+  .flow{list-style:none; margin:0; padding:0; counter-reset:step;}
+  .flow li{
+    counter-increment:step; position:relative; padding:8px 0 8px 34px;
+    font-size:12.6px; color:var(--ink-soft); line-height:1.5;
+    border-bottom:1px dashed var(--line);
+  }
+  .flow li:last-child{border-bottom:none;}
+  .flow li::before{
+    content: counter(step); position:absolute; left:0; top:8px;
+    width:22px; height:22px; border-radius:50%; background:var(--blue); color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:11.5px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flow li b{color:var(--ink);}
+
+  /* expert mode cards */
+  .expert-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .expert-card{
+    border-radius:14px; padding:16px 16px 14px; background:#fff;
+    border:1px solid var(--line); position:relative; overflow:hidden;
+  }
+  .expert-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px;}
+  .expert-card.recommended::before{background:var(--green);}
+  .expert-card.destructive::before{background:var(--red);}
+  .expert-card.neutral::before{background:var(--amber);}
+  .expert-card.compare::before{background:var(--blue);}
+  .expert-card .tag{
+    display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.4px;
+    text-transform:uppercase; padding:3px 8px; border-radius:999px; margin-bottom:8px;
+  }
+  .expert-card.recommended .tag{background:var(--green-soft); color:var(--green);}
+  .expert-card.destructive .tag{background:var(--red-soft); color:var(--red);}
+  .expert-card.neutral .tag{background:var(--amber-soft); color:var(--amber);}
+  .expert-card.compare .tag{background:var(--blue-soft); color:var(--blue);}
+  .expert-card h4{margin:0 0 6px; font-family:'Space Grotesk',sans-serif; font-size:14px;}
+  .expert-card p{margin:0 0 6px; font-size:12.3px; line-height:1.5; color:var(--ink-soft);}
+  .expert-card ul{margin:6px 0 0; padding-left:16px; font-size:12px; color:var(--ink-soft); line-height:1.55;}
+  .expert-card ul li{margin-bottom:3px;}
+
+  footer{text-align:center; color:#8FB0DA; font-size:12px; margin-top:28px; letter-spacing:.3px;}
+
+  @media (max-width:1150px){
+    .row3{grid-template-columns:1fr 1fr;}
+    .expert-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:640px){
+    .row3, .row2{grid-template-columns:1fr;}
+    .expert-grid{grid-template-columns:1fr;}
+    .masthead{flex-direction:column; align-items:flex-start;}
+    .tcode-list li{grid-template-columns:78px 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- Header -->
+  <div class="masthead">
+    <div class="title-block">
+      <span class="eyebrow">Reference Sheet · SAP Security Basics</span>
+      <h1>SAP Security Cheat Sheet</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="ecc.html" class="active">ECC Security</a>
+      <a href="grc.html">GRC (AC)</a>
+      <a href="msmp.html">BRF+ / MSMP</a>
+      <a href="fiori.html">Fiori Security</a>
+    </nav>
+  </div>
+
+  <!-- Overview -->
+  <div class="row1">
+    <div class="panel">
+      <h2>Security Overview &amp; Importance</h2>
+      <p>SAP Security involves safeguarding SAP systems by managing user access, roles, and authorizations to protect critical business data and maintain compliance with security standards.</p>
+      <p>Effective SAP Security ensures data integrity, mitigates risks, prevents unauthorized access, and supports regulatory compliance across an organization's integrated SAP landscape.</p>
+    </div>
+  </div>
+
+  <!-- Tcodes / User Types / Tables -->
+  <div class="row3">
+    <div class="panel">
+      <h2>Important Transactions</h2>
+      <ul class="tcode-list">
+        <li><span class="code">SU01</span><span class="desc">Create / Change User</span></li>
+        <li><span class="code">SU01D</span><span class="desc">Display User</span></li>
+        <li><span class="code">SU10</span><span class="desc">Mass User Changes</span></li>
+        <li><span class="code">PFCG</span><span class="desc">Role Maintenance</span></li>
+        <li><span class="code">SUIM</span><span class="desc">User Information System</span></li>
+        <li><span class="code">SU53</span><span class="desc">Displays last authorization check that failed</span></li>
+        <li><span class="code">ST01</span><span class="desc">System Trace (STAUTHTRACE for setting trace system‑wide)</span></li>
+        <li><span class="code">PFUD</span><span class="desc">User Master Comparison</span></li>
+        <li><span class="code">SUPC</span><span class="desc">Mass Generation of Profile</span></li>
+        <li><span class="code">SU56</span><span class="desc">Display User Buffer</span></li>
+        <li><span class="code">SU24</span><span class="desc">Maintain Check Indicator</span></li>
+        <li><span class="code">SU25</span><span class="desc">Fill USOBT_C / USOBX_C with SAP default values</span></li>
+        <li><span class="code">SM19</span><span class="desc">Configure Security Audit Log</span></li>
+        <li><span class="code">SM20</span><span class="desc">View Security Audit Log</span></li>
+        <li><span class="code">SUGR</span><span class="desc">Maintain User Group</span></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>User Type in SAP</h2>
+      <ul class="kv-list">
+        <li><b>Dialog User:</b> individual interactive logins &mdash; personal access with standard checks and password expiration</li>
+        <li><b>System User:</b> background processing, system‑to‑system communication, scheduled tasks &mdash; no interactive login</li>
+        <li><b>Communication User:</b> external RFC connections &mdash; secure programmatic access without GUI login</li>
+        <li><b>Service User:</b> shared user for anonymous/multiple concurrent logins, limited interactive use &mdash; often for web services</li>
+        <li><b>Reference User:</b> assigned to other users to grant additional roles/authorizations without direct logon capability (used when a user's profile assignment would exceed 312 profiles)</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Important Tables</h2>
+      <ul class="table-list">
+        <li><code class="tbl">USR02</code> Logon data</li>
+        <li><code class="tbl">USR04</code> User master authorization</li>
+        <li><code class="tbl">USR10</code> Authorization profiles</li>
+        <li><code class="tbl">USR40</code> Table for illegal passwords</li>
+        <li><code class="tbl">USER_ADDR</code> Address data for users</li>
+        <li><code class="tbl">AGR_USERS</code> Assignment of roles to users</li>
+        <li><code class="tbl">AGR_1251</code> Authorization data for the activity group</li>
+        <li><code class="tbl">AGR_1252</code> Organizational elements for authorizations</li>
+        <li><code class="tbl">AGR_AGRS</code> Roles in composite roles</li>
+        <li><code class="tbl">AGR_DEFINE</code> Role definition</li>
+        <li><code class="tbl">AGR_TIME</code> Timestamp for role (including profile)</li>
+        <li><code class="tbl">USOBT_C</code> Relation transaction → authorization object</li>
+        <li><code class="tbl">USOBX_C</code> Check table for USOBT_C</li>
+        <li><code class="tbl">TDDAT</code> Table authorization group → table relation</li>
+        <li><code class="tbl">TBRG</code> Table authorization groups</li>
+        <li><code class="tbl">TRDIR</code> Program → authorization group relation</li>
+        <li><code class="tbl">E070</code> Stores transport requests &amp; tasks</li>
+        <li><code class="tbl">TACT</code> Available activities in SAP system</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Role Type banner -->
+  <div class="row1">
+    <div class="panel">
+      <h2>Role Type in SAP</h2>
+      <div class="row2" style="margin-bottom:0;">
+        <ul class="kv-list" style="margin:0;">
+          <li><b>Single Role:</b> a set of specific authorizations assigned to users, providing access to perform designated tasks</li>
+          <li><b>Composite Role:</b> groups multiple single roles together, simplifying user role assignment by bundling related authorizations</li>
+        </ul>
+        <ul class="kv-list" style="margin:0;">
+          <li><b>Derived Role:</b> inherits authorizations from a master role, allowing organizational‑level customization while keeping a consistent structure</li>
+          <li><b>Master Role:</b> a template role that acts as the source for derived roles &mdash; contains all authorizations without organizational values filled in</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Access issue / traffic / usobx -->
+  <div class="row3">
+    <div class="panel">
+      <h2>Access Issue</h2>
+      <ul class="kv-list" style="margin-bottom:10px;">
+        <li><b>SU53</b> &mdash; displays the last authorization check that failed</li>
+        <li><b>ST01 / STAUTHTRACE</b> &mdash; set trace on a user ID to check missing authorization</li>
+      </ul>
+      <div class="subhead">Return codes for trace</div>
+      <div class="rc-item"><span class="rc-badge ok">RC = 0</span><p>Authorization check successful.</p></div>
+      <div class="rc-item"><span class="rc-badge warn">RC = 4</span><p>Check unsuccessful &mdash; user has the authorization object in their buffer, but with different values than checked.</p></div>
+      <div class="rc-item"><span class="rc-badge err">RC = 12</span><p>Check unsuccessful &mdash; user does not have the authorization object in their buffer at all.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>PFCG Traffic Indicator</h2>
+      <div class="traffic-item"><span class="dot red"></span><p><b>Red</b> &mdash; some organizational value has not been maintained in the org field in Profile Generator.</p></div>
+      <div class="traffic-item"><span class="dot yellow"></span><p><b>Yellow</b> &mdash; some or all fields in certain authorization instances are blank (not maintained).</p></div>
+      <div class="traffic-item"><span class="dot green"></span><p><b>Green</b> &mdash; all authorization fields are maintained (values are assigned).</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>USOBX_C &amp; USOBT_C</h2>
+      <p>Both tables are used by <code class="tbl">SU24</code>.</p>
+      <ul class="kv-list">
+        <li><b>USOBX_C:</b> defines the status of authorization checks for authorization objects (check indicator = Yes/No), and whether check values are maintained in SU24.</li>
+        <li><b>USOBT_C:</b> defines the actual "values" maintained for check‑maintained authorization objects.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SU24 banner -->
+  <div class="row1">
+    <div class="panel">
+      <h2>SU24</h2>
+      <div class="row3" style="margin-bottom:0;">
+        <div>
+          <div class="subhead">Check / No</div>
+          <p style="margin:0;">Authorization object is checked at t‑code execution, but no field value is proposed when the t‑code is added to the role menu.</p>
+        </div>
+        <div>
+          <div class="subhead">Check / Yes</div>
+          <p style="margin:0;">Object is checked at execution and automatically pulled into the role when the t‑code is added to the menu &mdash; may or may not carry field values, depending on what's maintained in SU24.</p>
+        </div>
+        <div>
+          <div class="subhead">Do Not Check</div>
+          <p style="margin:0;">Object is not checked at all, even though it may still exist in the ABAP code.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SU25 + Critical auth -->
+  <div class="row2">
+    <div class="panel">
+      <h2>SU25 Steps</h2>
+      <ol class="flow">
+        <li><b>Step 1 — Copy SAP Data:</b> copies SAP‑provided authorization checks (SU24 proposals) from a previous release into the current one.</li>
+        <li><b>Step 2a — Compare SAP Data:</b> compares and displays changes in SAP‑provided default values for authorization objects.</li>
+        <li><b>Step 2b — Adjust Proposals:</b> allows modification of SAP's default values for authorization objects based on new/changed SAP data.</li>
+        <li><b>Step 2c — Update Customer Tables:</b> automatically updates customer authorization tables with the changes made to default values.</li>
+        <li><b>Step 2d — Check Transaction Replacements:</b> checks whether SAP has introduced new transactions in place of existing ones &mdash; important during ECC → S/4 upgrades.</li>
+        <li><b>Step 3 — Mass Generation of Profiles:</b> regenerates authorization profiles for roles affected by changes to authorization proposals.</li>
+        <li><b>Step 4 — Upgrade Post‑Activities:</b> performs post‑upgrade activities such as manual adjustments to authorization objects or roles.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>Critical Authorization Objects</h2>
+      <ul class="table-list">
+        <li><code class="tbl">S_TABU_DIS</code> Protects tables using authorization groups with activity</li>
+        <li><code class="tbl">S_TABU_CLI</code> Protects cross‑client tables</li>
+        <li><code class="tbl">S_TABU_NAM</code> Table access control based on table name</li>
+        <li><code class="tbl">S_PROGRAM</code> Controls running ABAP reports/programs via SA38</li>
+        <li><code class="tbl">S_DEVELOP</code> Controls ABAP object access / debug access</li>
+        <li><code class="tbl">S_USER_AGR</code> Used to control roles</li>
+        <li><code class="tbl">S_USER_AUT</code> Checked during authorization maintenance</li>
+        <li><code class="tbl">S_USER_GRP</code> Controls user groups</li>
+        <li><code class="tbl">S_USER_PRO</code> Used for profile maintenance</li>
+        <li><code class="tbl">S_BDC_MONI</code> Protects batch input monitoring</li>
+        <li><code class="tbl">S_BTCH_JOB</code> Background job monitoring &amp; administration</li>
+        <li><code class="tbl">S_BTCH_ADM</code> Background job administration</li>
+        <li><code class="tbl">S_BTCH_NAM</code> User‑level control for background job scheduling</li>
+        <li><code class="tbl">S_ADMI_FCD</code> Basis administration &mdash; spool and monitoring</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- NEW: Profile Generation Expert Mode -->
+  <div class="section-title">Profile Generation &mdash; Expert Mode (PFCG)</div>
+  <div class="row1">
+    <div class="panel">
+      <p style="margin-bottom:14px;">When you regenerate a profile in PFCG (<b>Authorizations</b> tab &rarr; <b>Change Authorization Data</b> &rarr; <b>Utilities</b> &rarr; <b>Expert Mode</b>), you choose <i>how</i> the existing authorization data is treated against the current menu / SU24 defaults. The option you pick determines what survives the regeneration.</p>
+
+      <div class="expert-grid">
+        <div class="expert-card destructive">
+          <span class="tag">Destructive</span>
+          <h4>Delete and Recreate Profile and Authorizations</h4>
+          <p>Wipes out <b>all</b> existing authorization data and rebuilds the profile completely fresh from current SU24 defaults.</p>
+          <ul>
+            <li>All custom / manually changed field values are lost</li>
+            <li>Organizational‑level values <b>are</b> retained</li>
+            <li>Use only when you deliberately want a clean rebuild</li>
+          </ul>
+        </div>
+
+        <div class="expert-card neutral">
+          <span class="tag">No comparison</span>
+          <h4>Edit Old Status</h4>
+          <p>Loads the last‑saved authorization data as‑is &mdash; no comparison is run against the role menu or SU24 updates.</p>
+          <ul>
+            <li>Ignores any t‑codes added or changed in the role menu</li>
+            <li>Useful only for touching up existing values, not for menu changes</li>
+          </ul>
+        </div>
+
+        <div class="expert-card recommended">
+          <span class="tag">Recommended</span>
+          <h4>Read Old Status and Merge with New Data</h4>
+          <p>Compares the current role menu / SU24 data against existing authorizations, pulls in new objects, and retains old customized values.</p>
+          <ul>
+            <li>Standard option for day‑to‑day role maintenance</li>
+            <li>Always the correct choice when generating <b>derived roles</b></li>
+            <li>No duplicate "open" fields created on next generation</li>
+          </ul>
+        </div>
+
+        <div class="expert-card compare">
+          <span class="tag">Default</span>
+          <h4>Read Old Status and Compare with New Data</h4>
+          <p>Same logic path used automatically by the standard <b>"Change Authorization Data"</b> button (not Expert Mode) whenever the role menu changes.</p>
+          <ul>
+            <li>New authorizations pulled in get status <b>New</b></li>
+            <li>Existing ones get status <b>Old</b></li>
+            <li>Good for reviewing exactly what changed before saving</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider" style="margin-top:16px;"></div>
+      <p style="margin-top:10px; margin-bottom:0;"><b>Rule of thumb:</b> use <i>Read old status and merge with new data</i> for routine maintenance and derived‑role generation; reserve <i>Delete and recreate</i> for a genuine clean‑slate rebuild, since it discards every manually maintained field value.</p>
+    </div>
+  </div>
+
+  <!-- NEW: Frequently Used Tables quick reference -->
+  <div class="section-title">Frequently Used Tables &mdash; Quick Reference</div>
+  <div class="row3">
+    <div class="panel">
+      <h2>User Tables</h2>
+      <ul class="table-list">
+        <li><code class="tbl">USR02</code> Logon data</li>
+        <li><code class="tbl">USR04</code> User master authorization</li>
+        <li><code class="tbl">USR10</code> Authorization profiles</li>
+        <li><code class="tbl">USR40</code> Table for illegal passwords</li>
+        <li><code class="tbl">USER_ADDR</code> Address data for users</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Role Tables</h2>
+      <ul class="table-list">
+        <li><code class="tbl">AGR_USERS</code> Assignment of roles to users</li>
+        <li><code class="tbl">AGR_1251</code> Authorization data for the activity group</li>
+        <li><code class="tbl">AGR_1252</code> Organizational elements for authorizations</li>
+        <li><code class="tbl">AGR_AGRS</code> Roles in composite roles</li>
+        <li><code class="tbl">AGR_DEFINE</code> Role definition</li>
+        <li><code class="tbl">AGR_TIME</code> Timestamp for role (including profile)</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Other Tables</h2>
+      <ul class="table-list">
+        <li><code class="tbl">USOBT_C</code> Relation transaction → authorization object</li>
+        <li><code class="tbl">USOBX_C</code> Check table for USOBT_C</li>
+        <li><code class="tbl">TDDAT</code> Table authorization group → table relation</li>
+        <li><code class="tbl">TBRG</code> Table authorization groups</li>
+        <li><code class="tbl">TRDIR</code> Program → authorization group relation</li>
+        <li><code class="tbl">E070</code> Stores transport requests &amp; tasks</li>
+        <li><code class="tbl">TACT</code> Available activities in SAP system</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>SAP Security Cheat Sheet · Same layout system as the GRC AC &amp; BRF+/MSMP sheets</footer>
+</div>
+</body>
+</html>

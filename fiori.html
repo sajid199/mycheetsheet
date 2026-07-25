@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAP Fiori Security Cheat Sheet</title>
+<style>
+  :root{
+    --bg:            #0B1E33;
+    --paper:         #F4F7FB;
+    --ink:           #0B1E33;
+    --ink-soft:      #4A5C72;
+    --line:          #DCE4EE;
+
+    --blue:          #1E6FD9;
+    --blue-soft:     #E7F0FD;
+    --teal:          #0E9B8A;
+    --teal-soft:     #E4F6F3;
+    --amber:         #D97C1F;
+    --amber-soft:    #FBEEE0;
+    --violet:        #7A5CC7;
+    --violet-soft:   #EFEAFB;
+    --red:           #D14343;
+    --red-soft:      #FBE7E7;
+    --green:         #1E9E5A;
+    --green-soft:    #E4F7EC;
+    --gold:          #B8860B;
+    --gold-soft:     #FBF1DA;
+
+    --code-bg:       #0F2540;
+    --code-ink:      #BFD9FF;
+    --param-bg:      #FFF3D6;
+    --param-ink:     #7A4E00;
+
+    --shadow: 0 1px 2px rgba(11,30,51,.06), 0 8px 20px -12px rgba(11,30,51,.18);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #123159 0%, transparent 60%),
+      var(--bg);
+    font-family:'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    color:var(--ink);
+    padding:32px 16px 64px;
+  }
+  .sheet{max-width:1400px; margin:0 auto;}
+
+  /* Header */
+  .masthead{
+    background:linear-gradient(135deg, #0F2540 0%, #143A66 55%, #1E6FD9 130%);
+    border-radius:18px; padding:26px 32px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    box-shadow:var(--shadow); margin-bottom:18px;
+  }
+  .masthead .title-block h1{
+    margin:0 0 6px; color:#fff; font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:clamp(24px, 3vw, 34px); letter-spacing:.3px;
+  }
+  .masthead .title-block .eyebrow{
+    display:inline-block; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:#9FC4FF; font-weight:700; margin-bottom:6px;
+  }
+  .nav-links{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .nav-links a{
+    color:#EAF2FF; text-decoration:none; font-size:12.5px; font-weight:700;
+    padding:9px 16px; border-radius:999px; white-space:nowrap;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    transition:background .15s,border-color .15s;
+  }
+  .nav-links a:hover{background:rgba(255,255,255,.18);}
+  .nav-links a.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+
+  .panel{
+    background:var(--paper); border-radius:16px; box-shadow:var(--shadow);
+    padding:20px 22px; border:1px solid var(--line);
+  }
+  .panel h2{
+    margin:0 0 12px; font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:16px; letter-spacing:.2px; color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+  }
+  .panel h2::before{content:""; width:8px;height:8px;border-radius:2px; background:var(--blue); display:inline-block;}
+  .panel p{margin:0 0 8px; font-size:13.5px; line-height:1.55; color:var(--ink-soft);}
+
+  .section-title{
+    color:#EAF2FF; font-family:'Space Grotesk',sans-serif; font-size:13px;
+    letter-spacing:2px; text-transform:uppercase; font-weight:700;
+    margin:26px 4px 12px; display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(234,242,255,.35), transparent);}
+
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+  .row1{display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:16px;}
+
+  .row3 .panel:nth-child(2) h2::before{background:var(--teal);}
+  .row3 .panel:nth-child(3) h2::before{background:var(--violet);}
+  .row2 .panel:nth-child(2) h2::before{background:var(--amber);}
+
+  .subhead{
+    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--ink-soft); margin:10px 0 4px;
+  }
+  .subhead:first-child{margin-top:0;}
+
+  .kv-list{list-style:none; margin:0 0 4px; padding:0; font-size:12.8px; line-height:1.6;}
+  .kv-list li{margin-bottom:6px;}
+  .kv-list b, .kv-list strong{color:var(--ink);}
+
+  code.tbl{
+    font-family:'JetBrains Mono','Courier New',monospace;
+    background:var(--code-bg); color:var(--code-ink);
+    padding:1px 6px; border-radius:5px; font-size:11.8px; font-weight:600; white-space:nowrap;
+  }
+  .table-list{list-style:none; margin:0; padding:0; font-size:12.5px; line-height:1.75; color:var(--ink-soft);}
+  .table-list li{display:flex; gap:6px; align-items:baseline; flex-wrap:wrap;}
+
+  .tcode-list{list-style:none; margin:0; padding:0; font-size:12.8px; line-height:1.55;}
+  .tcode-list li{
+    display:grid; grid-template-columns:150px 1fr; gap:8px; align-items:baseline;
+    padding:5px 0; border-bottom:1px dashed var(--line);
+  }
+  .tcode-list li:last-child{border-bottom:none;}
+  .tcode-list .code{
+    font-family:'JetBrains Mono',monospace; background:var(--code-bg); color:var(--code-ink);
+    padding:2px 7px; border-radius:5px; font-size:11px; font-weight:700; text-align:center;
+  }
+  .tcode-list .desc{color:var(--ink-soft);}
+
+  .divider{height:1px; background:var(--line); margin:8px 0 2px;}
+
+  /* flow / step list */
+  .flow{list-style:none; margin:0; padding:0; counter-reset:step;}
+  .flow li{
+    counter-increment:step; position:relative; padding:8px 0 8px 34px;
+    font-size:12.6px; color:var(--ink-soft); line-height:1.5;
+    border-bottom:1px dashed var(--line);
+  }
+  .flow li:last-child{border-bottom:none;}
+  .flow li::before{
+    content: counter(step); position:absolute; left:0; top:8px;
+    width:22px; height:22px; border-radius:50%; background:var(--blue); color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:11.5px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .flow li b{color:var(--ink);}
+
+  /* Common issues -> quick fixes */
+  .issue-list{list-style:none; margin:0; padding:0;}
+  .issue-list li{
+    padding:9px 0; border-bottom:1px dashed var(--line); font-size:12.6px; line-height:1.5;
+  }
+  .issue-list li:last-child{border-bottom:none;}
+  .issue-list .issue{color:var(--ink); font-weight:700; display:block; margin-bottom:2px;}
+  .issue-list .issue::before{content:"⚠ "; color:var(--amber);}
+  .issue-list .fix{color:var(--ink-soft); display:block;}
+  .issue-list .fix::before{content:"→ Fix: "; color:var(--teal); font-weight:700;}
+
+  footer{text-align:center; color:#8FB0DA; font-size:12px; margin-top:28px; letter-spacing:.3px;}
+
+  @media (max-width:1150px){
+    .row3{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:640px){
+    .row3, .row2{grid-template-columns:1fr;}
+    .masthead{flex-direction:column; align-items:flex-start;}
+    .tcode-list li{grid-template-columns:120px 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- Header -->
+  <div class="masthead">
+    <div class="title-block">
+      <span class="eyebrow">Reference Sheet · SAP Fiori Launchpad &amp; OData Security</span>
+      <h1>SAP Fiori Security Cheat Sheet</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="ecc.html">ECC Security</a>
+      <a href="grc.html">GRC (AC)</a>
+      <a href="msmp.html">BRF+ / MSMP</a>
+      <a href="fiori.html" class="active">Fiori Security</a>
+    </nav>
+  </div>
+
+  <!-- Overview -->
+  <div class="row1">
+    <div class="panel">
+      <h2>Fiori Security Overview</h2>
+      <p>SAP Fiori Security controls how users access Launchpad tiles, apps, and the OData/RFC services that power them &mdash; spanning both the <b>Front-end (Gateway) Server</b> and the <b>Back-end Server</b>.</p>
+      <p>Two common deployment models: <b>Embedded</b> &mdash; Gateway and backend on the same system (typical for S/4HANA) &mdash; and <b>Hub/Central</b> &mdash; a separate Front-end Server routing to one or more Back-end systems via system aliases and trusted RFC.</p>
+    </div>
+  </div>
+
+  <!-- Tcodes / Key concepts / Tables -->
+  <div class="row3">
+    <div class="panel">
+      <h2>Important Transactions</h2>
+      <ul class="tcode-list">
+        <li><span class="code">/UI2/FLPD_CUST</span><span class="desc">Launchpad Designer &mdash; customer catalogs &amp; groups</span></li>
+        <li><span class="code">/UI2/FLPD_CONF</span><span class="desc">Launchpad Designer &mdash; SAP delivered content</span></li>
+        <li><span class="code">/UI2/FLP</span><span class="desc">Launch the Fiori Launchpad</span></li>
+        <li><span class="code">/UI2/FLPCM_CUST</span><span class="desc">Manage Launchpad Spaces &amp; Pages (S/4HANA)</span></li>
+        <li><span class="code">/IWFND/MAINT_SERVICE</span><span class="desc">Activate/register OData service (front-end)</span></li>
+        <li><span class="code">/IWBEP/REG_SERVICE</span><span class="desc">Register OData service (back-end)</span></li>
+        <li><span class="code">/IWFND/GW_CLIENT</span><span class="desc">Gateway Client &mdash; test OData calls</span></li>
+        <li><span class="code">/IWFND/ERROR_LOG</span><span class="desc">Gateway error log</span></li>
+        <li><span class="code">/UI5/UI5_REPOSITORY_LOAD</span><span class="desc">Upload/manage a UI5 app in the ABAP repo</span></li>
+        <li><span class="code">SICF</span><span class="desc">Activate ICF services (required for launch)</span></li>
+        <li><span class="code">PFCG</span><span class="desc">Role maintenance &mdash; assign catalogs/groups/spaces</span></li>
+        <li><span class="code">/UI2/GW_APPS_LOG</span><span class="desc">App usage &amp; performance log</span></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Key Concepts</h2>
+      <ul class="kv-list">
+        <li><b>Catalog:</b> a container of tiles &amp; target mappings; assigned to roles, never directly to users</li>
+        <li><b>Group:</b> a set of tiles arranged on the user's home page (classic launchpad model)</li>
+        <li><b>Space &amp; Page:</b> newer launchpad content model (S/4HANA 2020+) that extends/replaces groups</li>
+        <li><b>Tile:</b> the visual launcher for an app, linked to a target mapping</li>
+        <li><b>Target Mapping:</b> connects a Semantic Object + Action to the real app (UI5 component, WebDynpro, transaction, or URL)</li>
+        <li><b>Semantic Object:</b> the business entity a tile represents (e.g. SalesOrder) &mdash; used for intent-based navigation</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Important Tables</h2>
+      <ul class="table-list">
+        <li><code class="tbl">/UI2/PAGE_BUILD_CUST</code> Custom page/tile customizing data</li>
+        <li><code class="tbl">/UI2/PAGE_BUILD_PERS</code> User personalization of pages/tiles</li>
+        <li><code class="tbl">/UI2/PAGE_BUILD_DATA</code> Merged active page data (runtime)</li>
+        <li><code class="tbl">/UI2/INTEROP</code> Front-end/back-end interoperability config</li>
+        <li><code class="tbl">/UI5/UI5_REPOSITORY</code> SAPUI5 application repository (BSP storage)</li>
+        <li><code class="tbl">AGR_1251</code> Role authorization data (incl. S_START / S_SERVICE)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Critical auth / ICF services / role building -->
+  <div class="row3">
+    <div class="panel">
+      <h2>Critical Authorization Objects</h2>
+      <ul class="table-list">
+        <li><code class="tbl">S_SERVICE</code> Controls execution of OData/ICF services used by apps</li>
+        <li><code class="tbl">S_START</code> Start authority for UI5 apps/tiles &mdash; auto-added from catalog</li>
+        <li><code class="tbl">S_ICF</code> Protects access to Internet Communication Framework services</li>
+        <li><code class="tbl">S_RFC</code> Front-end ↔ back-end RFC / trusted RFC communication</li>
+        <li><code class="tbl">S_TCODE</code> Needed when a tile launches a classic transaction/WebDynpro</li>
+        <li><code class="tbl">S_RFCACL</code> Trusted RFC connections in hub deployments</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>ICF Services to Activate (SICF)</h2>
+      <ul class="table-list">
+        <li><code class="tbl">/sap/bc/ui5_ui5</code> Serves SAPUI5 application resources</li>
+        <li><code class="tbl">/sap/opu/odata</code> Base node for all OData services</li>
+        <li><code class="tbl">/sap/bc/ui2/flp</code> Fiori Launchpad itself</li>
+        <li><code class="tbl">/sap/bc/ui2/start_up</code> Launchpad bootstrap/startup</li>
+        <li><code class="tbl">/sap/public/bc</code> Public/unauthenticated resources (icons, fonts)</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Role Building Steps</h2>
+      <ol class="flow">
+        <li><b>Catalog:</b> identify the catalog(s) with the needed tiles in /UI2/FLPD_CUST</li>
+        <li><b>Group/Space:</b> add tiles to a Group (classic) or a Space &amp; Page (S/4HANA)</li>
+        <li><b>PFCG:</b> add the catalog + group/space to the role's Menu tab</li>
+        <li><b>Generate:</b> S_START values are pulled in automatically on profile generation</li>
+        <li><b>Backend auth:</b> add S_SERVICE + business objects in the same/companion role</li>
+        <li><b>Assign &amp; test:</b> assign the role to the user and verify in the Launchpad</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Common issues & quick fixes -->
+  <div class="section-title">Common Issues &amp; Quick Fixes</div>
+  <div class="row2">
+    <div class="panel">
+      <ul class="issue-list">
+        <li><span class="issue">Tile missing from launchpad</span><span class="fix">confirm the catalog &amp; group/space are on the role's Menu tab, then regenerate the profile.</span></li>
+        <li><span class="issue">"Service cannot be reached" / 404 on open</span><span class="fix">activate the OData service in /IWFND/MAINT_SERVICE and confirm the ICF node is active in SICF.</span></li>
+        <li><span class="issue">403 Forbidden after clicking a tile</span><span class="fix">add the missing S_SERVICE value for that OData service to the role.</span></li>
+        <li><span class="issue">Tile opens but "not authorized"</span><span class="fix">run ST01/SU53 to trace the missing object &mdash; usually S_START &mdash; and add it to the role.</span></li>
+        <li><span class="issue">Blank/white screen on app launch</span><span class="fix">re-deploy the UI5 app via /UI5/UI5_REPOSITORY_LOAD and check the browser console for failed requests.</span></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <ul class="issue-list">
+        <li><span class="issue">Old tiles/icons after a role change</span><span class="fix">clear the Launchpad cache via /UI2/INVAL_CACHES and refresh the browser cache.</span></li>
+        <li><span class="issue">Personalized layout won't reset</span><span class="fix">use "Reset to Default" in User Settings, or clear the user's /UI2/PAGE_BUILD_PERS entries.</span></li>
+        <li><span class="issue">SSO login loop between front-end/back-end</span><span class="fix">recheck the SAML2 trust configuration and the system alias in SICF/SM59.</span></li>
+        <li><span class="issue">App works in backend but not via Fiori</span><span class="fix">check the target mapping's Semantic Object + Action and the system alias routing.</span></li>
+        <li><span class="issue">New custom catalog invisible to users</span><span class="fix">catalogs are only exposed through a role &mdash; there is no direct user-to-catalog assignment.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>SAP Fiori Security Cheat Sheet · Same layout system as the ECC, GRC AC &amp; BRF+/MSMP sheets</footer>
+</div>
+</body>
+</html>
