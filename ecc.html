@@ -168,7 +168,7 @@
   .flow li b{color:var(--ink);}
 
   /* expert mode cards */
-  .expert-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .expert-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
   .expert-card{
     border-radius:14px; padding:16px 16px 14px; background:#fff;
     border:1px solid var(--line); position:relative; overflow:hidden;
@@ -177,7 +177,6 @@
   .expert-card.recommended::before{background:var(--green);}
   .expert-card.destructive::before{background:var(--red);}
   .expert-card.neutral::before{background:var(--amber);}
-  .expert-card.compare::before{background:var(--blue);}
   .expert-card .tag{
     display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.4px;
     text-transform:uppercase; padding:3px 8px; border-radius:999px; margin-bottom:8px;
@@ -185,7 +184,6 @@
   .expert-card.recommended .tag{background:var(--green-soft); color:var(--green);}
   .expert-card.destructive .tag{background:var(--red-soft); color:var(--red);}
   .expert-card.neutral .tag{background:var(--amber-soft); color:var(--amber);}
-  .expert-card.compare .tag{background:var(--blue-soft); color:var(--blue);}
   .expert-card h4{margin:0 0 6px; font-family:'Space Grotesk',sans-serif; font-size:14px;}
   .expert-card p{margin:0 0 6px; font-size:12.3px; line-height:1.5; color:var(--ink-soft);}
   .expert-card ul{margin:6px 0 0; padding-left:16px; font-size:12px; color:var(--ink-soft); line-height:1.55;}
@@ -195,7 +193,6 @@
 
   @media (max-width:1150px){
     .row3{grid-template-columns:1fr 1fr;}
-    .expert-grid{grid-template-columns:1fr 1fr;}
   }
   @media (max-width:640px){
     .row3, .row2{grid-template-columns:1fr;}
@@ -395,11 +392,11 @@
     </div>
   </div>
 
-  <!-- NEW: Profile Generation Expert Mode -->
+  <!-- Profile Generation Expert Mode -->
   <div class="section-title">Profile Generation &mdash; Expert Mode (PFCG)</div>
   <div class="row1">
     <div class="panel">
-      <p style="margin-bottom:14px;">When you regenerate a profile in PFCG (<b>Authorizations</b> tab &rarr; <b>Change Authorization Data</b> &rarr; <b>Utilities</b> &rarr; <b>Expert Mode</b>), you choose <i>how</i> the existing authorization data is treated against the current menu / SU24 defaults. The option you pick determines what survives the regeneration.</p>
+      <p style="margin-bottom:14px;">When you regenerate a profile in PFCG (<b>Authorizations</b> tab &rarr; <b>Change Authorization Data</b> &rarr; <b>Utilities</b> &rarr; <b>Expert Mode</b>), Expert Mode gives you exactly <b>three</b> options for how existing authorization data is treated against the current menu / SU24 defaults. The option you pick determines what survives the regeneration.</p>
 
       <div class="expert-grid">
         <div class="expert-card destructive">
@@ -408,8 +405,8 @@
           <p>Wipes out <b>all</b> existing authorization data and rebuilds the profile completely fresh from current SU24 defaults.</p>
           <ul>
             <li>All custom / manually changed field values are lost</li>
-            <li>Organizational‑level values <b>are</b> retained</li>
             <li>Use only when you deliberately want a clean rebuild</li>
+            <li>Avoid on roles with hand‑maintained field values</li>
           </ul>
         </div>
 
@@ -419,6 +416,7 @@
           <p>Loads the last‑saved authorization data as‑is &mdash; no comparison is run against the role menu or SU24 updates.</p>
           <ul>
             <li>Ignores any t‑codes added or changed in the role menu</li>
+            <li>Open fields already present will not be flagged for update</li>
             <li>Useful only for touching up existing values, not for menu changes</li>
           </ul>
         </div>
@@ -430,18 +428,7 @@
           <ul>
             <li>Standard option for day‑to‑day role maintenance</li>
             <li>Always the correct choice when generating <b>derived roles</b></li>
-            <li>No duplicate "open" fields created on next generation</li>
-          </ul>
-        </div>
-
-        <div class="expert-card compare">
-          <span class="tag">Default</span>
-          <h4>Read Old Status and Compare with New Data</h4>
-          <p>Same logic path used automatically by the standard <b>"Change Authorization Data"</b> button (not Expert Mode) whenever the role menu changes.</p>
-          <ul>
-            <li>New authorizations pulled in get status <b>New</b></li>
-            <li>Existing ones get status <b>Old</b></li>
-            <li>Good for reviewing exactly what changed before saving</li>
+            <li>Never use "Delete and recreate" on a derived role</li>
           </ul>
         </div>
       </div>
@@ -451,7 +438,7 @@
     </div>
   </div>
 
-  <!-- NEW: Frequently Used Tables quick reference -->
+  <!-- Frequently Used Tables quick reference -->
   <div class="section-title">Frequently Used Tables &mdash; Quick Reference</div>
   <div class="row3">
     <div class="panel">
