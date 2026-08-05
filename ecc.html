@@ -189,6 +189,21 @@
   .expert-card ul{margin:6px 0 0; padding-left:16px; font-size:12px; color:var(--ink-soft); line-height:1.55;}
   .expert-card ul li{margin-bottom:3px;}
 
+  /* interview quick-notes cards */
+  .qa-card{
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; margin-bottom:10px;
+  }
+  .qa-card:last-child{margin-bottom:0;}
+  .qa-q{
+    display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:13px; color:var(--ink); margin-bottom:5px;
+  }
+  .qa-q::before{content:"Q"; width:20px; height:20px; border-radius:50%; background:var(--blue); color:#fff;
+    font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .qa-a{font-size:12.6px; color:var(--ink-soft); line-height:1.55; margin:0; padding-left:28px;}
+  .qa-a b{color:var(--ink);}
+
   footer{text-align:center; color:#8FB0DA; font-size:12px; margin-top:28px; letter-spacing:.3px;}
 
   @media (max-width:1150px){
@@ -362,13 +377,13 @@
     <div class="panel">
       <h2>SU25 Steps</h2>
       <ol class="flow">
-        <li><b>Step 1 — Copy SAP Data:</b> copies SAP‑provided authorization checks (SU24 proposals) from a previous release into the current one.</li>
-        <li><b>Step 2a — Compare SAP Data:</b> compares and displays changes in SAP‑provided default values for authorization objects.</li>
-        <li><b>Step 2b — Adjust Proposals:</b> allows modification of SAP's default values for authorization objects based on new/changed SAP data.</li>
-        <li><b>Step 2c — Update Customer Tables:</b> automatically updates customer authorization tables with the changes made to default values.</li>
-        <li><b>Step 2d — Check Transaction Replacements:</b> checks whether SAP has introduced new transactions in place of existing ones &mdash; important during ECC → S/4 upgrades.</li>
-        <li><b>Step 3 — Mass Generation of Profiles:</b> regenerates authorization profiles for roles affected by changes to authorization proposals.</li>
-        <li><b>Step 4 — Upgrade Post‑Activities:</b> performs post‑upgrade activities such as manual adjustments to authorization objects or roles.</li>
+        <li><b>Step 1 — Initial Fill:</b> used the first time Profile Generator is set up (or to reload every SAP default) &mdash; copies SAP's default check indicators &amp; field values into the customer tables (USOBT_C/USOBX_C).</li>
+        <li><b>Step 2a — Prepare Comparison:</b> run first, after an upgrade, to prepare the comparison between your existing SU24 data and the new SAP defaults.</li>
+        <li><b>Step 2b — Compare &amp; Adjust:</b> shows SAP's new default values next to your existing ones so you can adjust check indicators/field values &mdash; same maintenance screen as SU24.</li>
+        <li><b>Step 2c — Roles to Be Updated:</b> flags which roles are affected by the changes with status "profile comparison required," so their profiles can be regenerated (or SAP_NEW can be assigned as a temporary stopgap).</li>
+        <li><b>Step 2d — Transaction Replacements:</b> lists roles containing transaction codes SAP has replaced with new ones, so they can be swapped.</li>
+        <li><b>Step 3 — Transport:</b> transports the changes made in Steps 1, 2a and 2b to other systems.</li>
+        <li><b>Step 4 — Tailor Authorization Checks:</b> same maintenance as calling SU24 directly &mdash; edit check indicators per transaction (Check/Maintain adds the object to Profile Generator; Do Not Check skips it).</li>
       </ol>
     </div>
 
@@ -476,6 +491,46 @@
         <li><code class="tbl">E070</code> Stores transport requests &amp; tasks</li>
         <li><code class="tbl">TACT</code> Available activities in SAP system</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- Interview Quick Notes: SU24 vs SU25 -->
+  <div class="section-title">Interview Quick Notes &mdash; SU24 vs SU25</div>
+  <div class="row2">
+    <div class="panel">
+      <h2>When to Use SU24</h2>
+      <p style="margin-bottom:12px;">In simple terms: SU24 is where you tell the Profile Generator <b>what to propose</b> for a transaction before anyone builds a role with it. Use it when:</p>
+      <div class="qa-card">
+        <div class="qa-q">Wrong link</div>
+        <p class="qa-a">An authorization object is <b>not linked correctly</b> to a transaction code &mdash; fix the transaction → object relationship in SU24.</p>
+      </div>
+      <div class="qa-card">
+        <div class="qa-q">Bad default value</div>
+        <p class="qa-a">An authorization object has an <b>unacceptable default value</b> proposed &mdash; correct the value SU24 proposes when the t‑code is added to a role.</p>
+      </div>
+      <div class="qa-card">
+        <div class="qa-q">Reusable across roles</div>
+        <p class="qa-a">You want a default that works for <b>every role</b> that will ever use the transaction &mdash; usually means leaving the field <b>blank</b> in SU24, so each role can maintain its own value instead of inheriting a fixed one.</p>
+      </div>
+      <p style="margin-top:12px; margin-bottom:0;"><b>One-liner for the interview:</b> "SU24 controls what the Profile Generator proposes for a t‑code &mdash; I use it to fix incorrect object/t‑code links and bad default values, and to keep fields blank when different roles legitimately need different values."</p>
+    </div>
+
+    <div class="panel">
+      <h2>SU25 in Simple Terms</h2>
+      <p style="margin-bottom:12px;">SU25 is the <b>one‑time / post‑upgrade tool</b> that loads SAP's SU24 defaults into your customer tables and lets you compare them after an upgrade &mdash; SU24 is for ongoing, transaction‑by‑transaction maintenance.</p>
+      <div class="qa-card">
+        <div class="qa-q">Why use it</div>
+        <p class="qa-a">After an SAP upgrade, new/changed authorization checks ship with new SU24 defaults. SU25 walks you through adopting them without losing what you already customized.</p>
+      </div>
+      <div class="qa-card">
+        <div class="qa-q">First time vs. after upgrade</div>
+        <p class="qa-a"><b>First time</b> using Profile Generator → run Step 1 (initial fill). <b>Already using it, now upgrading</b> → run Steps 2a → 2b → 2c → 2d in that order.</p>
+      </div>
+      <div class="qa-card">
+        <div class="qa-q">SU24 vs SU25</div>
+        <p class="qa-a"><b>SU24</b> = maintain proposals for one transaction at a time, anytime. <b>SU25</b> = bulk‑load/compare SAP's defaults, mainly right after an upgrade; Step 4 of SU25 drops you into the same screen as SU24.</p>
+      </div>
+      <p style="margin-top:12px; margin-bottom:0;"><b>One-liner for the interview:</b> "SU25 is the upgrade tool that syncs the customer authorization tables with SAP's new SU24 defaults and tells me which roles need regeneration; SU24 is what I use day‑to‑day to fine‑tune one transaction's proposal."</p>
     </div>
   </div>
 
