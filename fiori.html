@@ -158,6 +158,22 @@
   .issue-list .fix{color:var(--ink-soft); display:block;}
   .issue-list .fix::before{content:"→ Fix: "; color:var(--teal); font-weight:700;}
 
+  .cheat-table{width:100%; border-collapse:collapse; font-size:12.6px; line-height:1.5;}
+  .cheat-table thead th{
+    text-align:left; font-family:'Space Grotesk','IBM Plex Sans',sans-serif;
+    font-size:11px; letter-spacing:1px; text-transform:uppercase; font-weight:700;
+    color:#fff; background:var(--blue); padding:10px 14px;
+  }
+  .cheat-table thead th:first-child{border-radius:8px 0 0 0;}
+  .cheat-table thead th:last-child{border-radius:0 8px 0 0;}
+  .cheat-table tbody td{
+    padding:10px 14px; border-bottom:1px solid var(--line); color:var(--ink-soft); vertical-align:top;
+  }
+  .cheat-table tbody td:first-child{color:var(--ink); font-weight:600;}
+  .cheat-table tbody tr:nth-child(even){background:var(--blue-soft);}
+  .cheat-table tbody tr:last-child td{border-bottom:none;}
+  .cheat-table code.tbl{white-space:normal;}
+
   footer{text-align:center; color:#8FB0DA; font-size:12px; margin-top:28px; letter-spacing:.3px;}
 
   @media (max-width:1150px){
@@ -280,26 +296,112 @@
     </div>
   </div>
 
-  <!-- Common issues & quick fixes -->
-  <div class="section-title">Common Issues &amp; Quick Fixes</div>
-  <div class="row2">
+  <!-- Troubleshooting Quick Reference Table -->
+  <div class="section-title">Troubleshooting Quick Reference</div>
+  <div class="row1">
     <div class="panel">
-      <ul class="issue-list">
-        <li><span class="issue">Tile missing from launchpad</span><span class="fix">confirm the catalog &amp; group/space are on the role's Menu tab, then regenerate the profile.</span></li>
-        <li><span class="issue">"Service cannot be reached" / 404 on open</span><span class="fix">activate the OData service in /IWFND/MAINT_SERVICE and confirm the ICF node is active in SICF.</span></li>
-        <li><span class="issue">403 Forbidden after clicking a tile</span><span class="fix">add the missing S_SERVICE value for that OData service to the role.</span></li>
-        <li><span class="issue">Tile opens but "not authorized"</span><span class="fix">run ST01/SU53 to trace the missing object &mdash; usually S_START &mdash; and add it to the role.</span></li>
-        <li><span class="issue">Blank/white screen on app launch</span><span class="fix">re-deploy the UI5 app via /UI5/UI5_REPOSITORY_LOAD and check the browser console for failed requests.</span></li>
-      </ul>
-    </div>
-    <div class="panel">
-      <ul class="issue-list">
-        <li><span class="issue">Old tiles/icons after a role change</span><span class="fix">clear the Launchpad cache via /UI2/INVAL_CACHES and refresh the browser cache.</span></li>
-        <li><span class="issue">Personalized layout won't reset</span><span class="fix">use "Reset to Default" in User Settings, or clear the user's /UI2/PAGE_BUILD_PERS entries.</span></li>
-        <li><span class="issue">SSO login loop between front-end/back-end</span><span class="fix">recheck the SAML2 trust configuration and the system alias in SICF/SM59.</span></li>
-        <li><span class="issue">App works in backend but not via Fiori</span><span class="fix">check the target mapping's Semantic Object + Action and the system alias routing.</span></li>
-        <li><span class="issue">New custom catalog invisible to users</span><span class="fix">catalogs are only exposed through a role &mdash; there is no direct user-to-catalog assignment.</span></li>
-      </ul>
+      <table class="cheat-table">
+        <thead>
+          <tr>
+            <th>Symptoms</th>
+            <th>Root Cause</th>
+            <th>How to Check</th>
+            <th>Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>User cannot see the tile on Launchpad</td>
+            <td>Missing Catalog, Group, Space/Page, or role</td>
+            <td><code class="tbl">PFCG</code>, Launchpad Content Manager, <code class="tbl">SU01</code></td>
+            <td>Assign the correct Fiori catalog/group/space/page in the role, regenerate profile, user comparison.</td>
+          </tr>
+          <tr>
+            <td>Authorization error after clicking tile</td>
+            <td>Missing authorization object</td>
+            <td><code class="tbl">SU53</code>, <code class="tbl">STAUTHTRACE</code>, <code class="tbl">ST01</code></td>
+            <td>Identify failed authorization object and maintain it in PFCG role.</td>
+          </tr>
+          <tr>
+            <td>Browser displays 403</td>
+            <td>Missing ICF authorization or service authorization</td>
+            <td><code class="tbl">SICF</code>, <code class="tbl">SU53</code></td>
+            <td>Activate required ICF service and provide authorization.</td>
+          </tr>
+          <tr>
+            <td>Page not found (404)</td>
+            <td>OData or ICF service inactive</td>
+            <td><code class="tbl">SICF</code>, <code class="tbl">/IWFND/MAINT_SERVICE</code></td>
+            <td>Activate ICF service and register OData service.</td>
+          </tr>
+          <tr>
+            <td>Application crashes (HTTP 500)</td>
+            <td>Backend ABAP dump or programming issue</td>
+            <td><code class="tbl">ST22</code>, <code class="tbl">SM21</code></td>
+            <td>Analyze dump and coordinate with ABAP team.</td>
+          </tr>
+          <tr>
+            <td>White/blank page after clicking tile</td>
+            <td>JavaScript/UI5 cache issue or browser cache</td>
+            <td>Browser Developer Tools, <code class="tbl">/UI2/INVALIDATE_CACHE</code></td>
+            <td>Clear browser cache, invalidate UI5 cache, check console errors.</td>
+          </tr>
+          <tr>
+            <td>App fails during loading</td>
+            <td>OData service inactive or backend issue</td>
+            <td><code class="tbl">/IWFND/ERROR_LOG</code>, <code class="tbl">/IWBEP/ERROR_LOG</code></td>
+            <td>Register/activate OData service and resolve backend error.</td>
+          </tr>
+          <tr>
+            <td>Save/Create operation fails</td>
+            <td>Invalid or expired CSRF token</td>
+            <td>Browser Network Tab</td>
+            <td>Refresh session or reload application.</td>
+          </tr>
+          <tr>
+            <td>User still cannot see app after role assignment</td>
+            <td>User buffer not refreshed</td>
+            <td><code class="tbl">SU56</code>, <code class="tbl">SU01</code></td>
+            <td>Reset user buffer, log off/on, perform user comparison.</td>
+          </tr>
+          <tr>
+            <td>Tile visible but cannot open</td>
+            <td>Missing Target Mapping</td>
+            <td>Launchpad Designer / Content Manager</td>
+            <td>Create or assign target mapping.</td>
+          </tr>
+          <tr>
+            <td>Navigation fails</td>
+            <td>Incorrect semantic object/action</td>
+            <td>Launchpad Content Manager</td>
+            <td>Correct semantic object and action configuration.</td>
+          </tr>
+          <tr>
+            <td>Service returns 401/403</td>
+            <td>Missing backend authorization</td>
+            <td><code class="tbl">SU53</code>, <code class="tbl">STAUTHTRACE</code></td>
+            <td>Assign missing authorization objects.</td>
+          </tr>
+          <tr>
+            <td>Works in DEV but not QA/PRD</td>
+            <td>Transport missing</td>
+            <td><code class="tbl">STMS</code>, <code class="tbl">SE10</code></td>
+            <td>Transport catalog, role, and backend objects correctly.</td>
+          </tr>
+          <tr>
+            <td>Changes not reflected</td>
+            <td>Launchpad/UI5 cache</td>
+            <td><code class="tbl">/UI2/INVALIDATE_CACHE</code>, <code class="tbl">/UI5/APP_INDEX_CALCULATE</code></td>
+            <td>Clear caches and rebuild app index.</td>
+          </tr>
+          <tr>
+            <td>"Service Cannot Be Reached"</td>
+            <td>ICF service inactive</td>
+            <td><code class="tbl">SICF</code></td>
+            <td>Activate the required ICF node.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
